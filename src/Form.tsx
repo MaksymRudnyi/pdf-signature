@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { HiOutlineArrowCircleRight } from "react-icons/hi";
+import SignaturePad from 'react-signature-pad-wrapper'
 
 const fields = [
   {
     label: "First Name",
+    name: 'firstName',
     type: "text",
     placeholder: "John",
     required: true,
@@ -12,6 +14,7 @@ const fields = [
   },
   {
     label: "Last Name",
+    name: 'lastName',
     type: "text",
     placeholder: "Doe",
     required: true,
@@ -19,6 +22,7 @@ const fields = [
   },
   {
     label: "Email",
+    name: 'email',
     type: "email",
     placeholder: "john.doe@example.com",
     required: true,
@@ -26,6 +30,7 @@ const fields = [
   },
   {
     label: "Phone",
+    name: 'phone',
     type: "tel",
     placeholder: "+1 123-456-7890",
     required: true,
@@ -33,6 +38,7 @@ const fields = [
   },
   {
     label: "Address",
+    name: 'address',
     type: "text",
     placeholder: "123 Main St, City, Country",
     required: true,
@@ -40,7 +46,7 @@ const fields = [
   }
 ];
 
-export default function RegisterForm() {
+export default function Form({ onData }) {
   const {
     register,
     handleSubmit,
@@ -48,8 +54,14 @@ export default function RegisterForm() {
     watch,
   } = useForm();
 
+  const sigPad = useRef<any>();
+
   const onSubmit = (data) => {
     console.log(data);
+    onData({
+      ...data,
+      signature: sigPad.current.toDataURL()
+    })
     // You can perform further actions with the form data here
   };
   return (
@@ -57,7 +69,7 @@ export default function RegisterForm() {
       <div className="container mx-auto">
         <div className="lg:w-7/12 pb-10 pt-5 w-full p-4 flex flex-wrap justify-center shadow-2xl my-20 rounded-md mx-auto">
           <div className="pb-5">
-            <h1 className="text-3xl font-bold">May Form</h1>
+            <h1 className="text-3xl font-bold">My Form</h1>
           </div>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -73,7 +85,7 @@ export default function RegisterForm() {
                 >
                   <label className="font-semibold">{field.label}</label>
                   <input
-                    {...register(field.label.toLowerCase(), {
+                    {...register(field.name, {
                       required: field.required,
                     })}
                     className={`border border-gray-300 text-sm font-semibold mb-1 max-w-full w-full outline-none rounded-md m-0 py-3 px-4 md:py-3 md:px-4 md:mb-0 focus:border-red-500 ${
@@ -87,6 +99,15 @@ export default function RegisterForm() {
                   )}
                 </div>
               ))}
+
+              <div
+                className={`text-left flex flex-col gap-2 w-full md:col-span-2`}
+              >
+                <label className="font-semibold">Signature</label>
+                <div className={'border border-gray-300 rounded-md '}>
+                  <SignaturePad ref={sigPad}  options={{minWidth: 2, maxWidth: 5, penColor: 'rgb(0, 0, 0)'}} />
+                </div>
+              </div>
             </div>
 
             <div className="w-full text-left">
